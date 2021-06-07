@@ -1,101 +1,104 @@
 use crate::*;
 
-#[derive(Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "postgres_queries", derive(FromSqlRow))]
 pub struct MediaKey(pub u64);
 
-#[derive(Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
 pub struct MediaInfo {
   pub id: MediaKey,
   pub title: String,
   pub kind: MediaKind,
   pub author: userinfo::AuthorInfo,
+  pub rating: MediaRating
 }
 
-#[derive(Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum MediaKind {
   Audio,
   Video,
   Image
 }
 
-#[derive(Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
 pub struct Media {
   pub info: MediaInfo,
   pub materials: Vec<MaterialInfo>
 }
 
-#[derive(Serialize, Deserialize, Default)]
+#[derive(Default)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct MaterialKey(pub u64);
 
-#[derive(Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct MaterialInfo {
   pub id: MaterialKey,
   pub format: String,
   pub quality: MaterialQuality,
-  #[serde(rename = "licenseName")]
+  #[cfg_attr(feature = "serde", serde(rename = "licenseName"))]
   pub license_name: String,
-  #[serde(rename = "downloadLink")]
+  #[cfg_attr(feature = "serde", serde(rename = "downloadLink"))]
   pub download_link: String
 }
 
 //TODO: Material quality enumeration
-#[derive(Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum MaterialQuality {
     Low,
     Medium,
     High
 }
 
-#[derive(Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct MediaRating(pub f64);
 
-#[derive(Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
 pub struct Tag {
     pub title: String,
     pub popularity: MediaRating
 }
 
-#[derive(Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct ReviewRating(pub u8);
 
-#[derive(Deserialize)]
+#[cfg_attr(feature = "serde", derive(Deserialize))]
 pub struct ReviewKey(pub u8);
 
-#[derive(Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct UserReview {
-    #[serde(rename = "userInfo")]
+  #[cfg_attr(feature = "serde", serde(rename = "userInfo"))]
     pub user_info: userinfo::UserInfo,
     pub review: Review
 }
 
-#[derive(Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Review {
     pub rating: ReviewRating,
-    #[serde(skip_serializing_if = "Option::is_some")]
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
     pub text: Option<String> 
 }
 
-#[derive(Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct RemoveReview {
     pub id: ReviewKey,
     pub reason: ReviewRemovalReasonKey
 }
 
-#[derive(Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct ReviewRemovalReasonKey(u32);
 
-#[derive(Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct ReviewRemovalReason {
     pub id: ReviewRemovalReasonKey,
     pub statement: String
 }
 
-#[derive(Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct RegisterMedia {
     pub title: String,
     pub kind: MediaKind,
     pub tags: Vec<String>,
-    #[serde(rename = "defaultLicense")]
+    #[cfg_attr(feature = "serde", serde(rename = "defaultLicense"))]
     pub default_license: Option<String>,
 }
 

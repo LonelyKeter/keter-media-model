@@ -1,5 +1,7 @@
-#[macro_use] extern crate serde;
-extern crate chrono;
+#[cfg(serde)]
+use serde::{Serialize, Deserialize};
+#[cfg(postgres_query)]
+use postgres_query::FromSqlRow;
 
 pub mod media;
 pub mod reviews;

@@ -1,28 +1,28 @@
 use crate::*;
 use chrono::{DateTime, offset::Utc};
 
-#[derive(Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Usage {
-    #[serde(rename = "materialId")]
+    #[cfg_attr(feature = "serde", serde(rename = "materialId"))]
     pub material_id: media::MaterialKey,
-    #[serde(rename = "userName")] 
+    #[cfg_attr(feature = "serde", serde(rename = "userName"))]
     pub user_name: String,
     pub email: String,
     pub date: DateTime<Utc>
 }
 
-#[derive(Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct LicenseInfo {
     pub title: String,
     pub link: String
 }
 
-#[derive(Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct LicenseKey(pub u32);
 
-#[derive(Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct License {
     pub id: LicenseKey,
-    #[serde(flatten)]
+    #[cfg_attr(feature = "serde", serde(flatten))]
     pub info: LicenseInfo
 }

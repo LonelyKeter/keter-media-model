@@ -1,20 +1,20 @@
-#[derive(Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct UserKey(pub u64);
 
-#[derive(Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct UserInfo {
     pub id: UserKey,
     pub name: String
 }
 
-#[derive(Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct AuthorInfo {
-    #[serde(flatten)]
+    #[cfg_attr(feature = "serde", serde(flatten))]
     pub user_info: UserInfo,
     pub country: String
 }
 
-#[derive(Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct AuthorContacts {
     pub name: String,
     pub email: String
