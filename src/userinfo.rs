@@ -1,5 +1,8 @@
+use std::num::NonZeroU64;
+
+#[derive(Copy, Clone, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct UserKey(pub u64);
+pub struct UserKey(pub NonZeroU64);
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct UserInfo {
