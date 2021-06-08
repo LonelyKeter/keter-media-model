@@ -1,8 +1,6 @@
 use crate::*;
 
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "postgres_queries", derive(FromSqlRow))]
-pub struct MediaKey(pub u64);
+pub type MediaKey = u64;
 
 #[cfg_attr(feature = "serde", derive(Serialize))]
 pub struct MediaInfo {
@@ -25,10 +23,7 @@ pub struct Media {
   pub info: MediaInfo,
   pub materials: Vec<MaterialInfo>
 }
-
-#[derive(Default)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct MaterialKey(pub u64);
+pub type MaterialKey = u64;
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct MaterialInfo {
@@ -58,11 +53,9 @@ pub struct Tag {
     pub popularity: MediaRating
 }
 
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct ReviewRating(pub u8);
+pub type ReviewRating = u8;
 
-#[cfg_attr(feature = "serde", derive(Deserialize))]
-pub struct ReviewKey(pub u8);
+pub type ReviewKey = u64;
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct UserReview {
@@ -84,8 +77,7 @@ pub struct RemoveReview {
     pub reason: ReviewRemovalReasonKey
 }
 
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct ReviewRemovalReasonKey(u32);
+pub type ReviewRemovalReasonKey = u32;
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct ReviewRemovalReason {

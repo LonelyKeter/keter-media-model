@@ -17,8 +17,8 @@ pub struct LicenseInfo {
     pub link: String
 }
 
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct LicenseKey(pub u32);
+
+pub type LicenseKey = u32;
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct License {

@@ -1,6 +1,4 @@
-#[cfg(serde)]
-use serde::{Serialize, Deserialize};
-#[cfg(postgres_query)]
+use serde::{Serialize, Deserialize}; 
 use postgres_query::FromSqlRow;
 
 pub mod media;
