@@ -44,8 +44,8 @@ pub enum MaterialQuality {
     High
 }
 
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct MediaRating(pub f64);
+
+pub type MediaRating = f64;
 
 #[cfg_attr(feature = "serde", derive(Serialize))]
 pub struct Tag {
