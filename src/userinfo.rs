@@ -26,22 +26,22 @@ pub struct AuthorContacts {
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "postgres_query", derive(FromSqlRow))]
 pub struct UserPrivelegies {
-    author: bool,
-    moderator: bool,
-    admin: bool
+    pub author: bool,
+    pub moderator: bool,
+    pub admin: bool
 }
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "postgres_query", derive(FromSqlRow))]
 pub struct LoginData {
-    email: String,
-    password: String
+    pub email: String,
+    pub password: String
 }
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "postgres_query", derive(FromSqlRow))]
 pub struct RegisterData {
-    user_name: String,
+    #[serde(rename = "userName", flatten)]
+    pub user_name: String,
     #[serde(rename = "loginData", flatten)]
-    login_data: LoginData
+    pub login_data: LoginData
 }
