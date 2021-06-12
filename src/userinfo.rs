@@ -1,15 +1,15 @@
 use crate::*;
 
-use std::num::NonZeroU64;
+pub type UserKey = i32;
 
-pub type UserKey = NonZeroU64;
-
+#[derive(Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct UserInfo {
     pub id: UserKey,
     pub name: String
 }
 
+#[derive(Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct AuthorInfo {
     #[cfg_attr(feature = "serde", serde(flatten))]
@@ -17,12 +17,14 @@ pub struct AuthorInfo {
     pub country: String
 }
 
+#[derive(Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct AuthorContacts {
     pub name: String,
     pub email: String
 }
 
+#[derive(Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "postgres_query", derive(FromSqlRow))]
 pub struct UserPrivelegies {
@@ -31,6 +33,7 @@ pub struct UserPrivelegies {
     pub admin: bool
 }
 
+#[derive(Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "postgres_query", derive(FromSqlRow))]
 pub struct LoginData {
@@ -38,10 +41,20 @@ pub struct LoginData {
     pub password: String
 }
 
+#[derive(Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct RegisterData {
     #[serde(rename = "userName", flatten)]
     pub user_name: String,
     #[serde(rename = "loginData", flatten)]
     pub login_data: LoginData
+}
+
+#[derive(Clone)]
+#[cfg_attr(feature = "postgres_query", derive(FromSqlRow))]
+pub struct UserIdPassHash {
+    #[cfg_attr(feature = "postgres_query", row(rename = "Id"))]
+    pub id: UserKey,
+    #[cfg_attr(feature = "postgres_query", row(rename = "Password"))]
+    pub password_hash: Vec<u8>
 }

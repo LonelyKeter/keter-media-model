@@ -1,6 +1,6 @@
 use crate::*;
 
-pub type MediaKey = u64;
+pub type MediaKey = i64;
 
 #[cfg_attr(feature = "serde", derive(Serialize))]
 pub struct MediaInfo {
@@ -23,7 +23,7 @@ pub struct Media {
   pub info: MediaInfo,
   pub materials: Vec<MaterialInfo>
 }
-pub type MaterialKey = u64;
+pub type MaterialKey = i64;
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct MaterialInfo {
@@ -55,7 +55,7 @@ pub struct Tag {
 
 pub type ReviewRating = u8;
 
-pub type ReviewKey = u64;
+pub type ReviewKey = i64;
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct UserReview {
@@ -77,7 +77,7 @@ pub struct RemoveReview {
     pub reason: ReviewRemovalReasonKey
 }
 
-pub type ReviewRemovalReasonKey = u32;
+pub type ReviewRemovalReasonKey = i32;
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct ReviewRemovalReason {
