@@ -4,8 +4,11 @@ pub type UserKey = i32;
 
 #[derive(Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "postgres_query", derive(FromSqlRow))]
 pub struct UserInfo {
+    #[cfg_attr(feature = "postgres_query", row(rename = "Id"))]
     pub id: UserKey,
+    #[cfg_attr(feature = "postgres_query", row(rename = "Name"))]
     pub name: String
 }
 
@@ -27,9 +30,12 @@ pub struct AuthorContacts {
 #[derive(Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "postgres_query", derive(FromSqlRow))]
-pub struct UserPrivelegies {
+pub struct UserPriveleges {
+    #[cfg_attr(feature = "postgres_query", row(rename = "Author"))]
     pub author: bool,
+    #[cfg_attr(feature = "postgres_query", row(rename = "Moderator"))]
     pub moderator: bool,
+    #[cfg_attr(feature = "postgres_query", row(rename = "Admin"))]
     pub admin: bool
 }
 

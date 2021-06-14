@@ -1,4 +1,4 @@
-use crate::*;
+use crate::{*, userinfo::UserInfo};
 
 pub type MediaKey = i64;
 
@@ -53,7 +53,7 @@ pub struct Tag {
     pub popularity: MediaRating
 }
 
-pub type ReviewRating = u8;
+pub type ReviewRating = i16;
 
 pub type ReviewKey = i64;
 
