@@ -2,7 +2,7 @@ use crate::*;
 
 pub type UserKey = i32;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "postgres_query", derive(FromSqlRow))]
 pub struct UserInfo {
@@ -12,7 +12,7 @@ pub struct UserInfo {
     pub name: String
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct AuthorInfo {
     #[cfg_attr(feature = "serde", serde(flatten))]
@@ -20,14 +20,14 @@ pub struct AuthorInfo {
     pub country: String
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct AuthorContacts {
     pub name: String,
     pub email: String
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "postgres_query", derive(FromSqlRow))]
 pub struct UserPriveleges {
@@ -35,11 +35,11 @@ pub struct UserPriveleges {
     pub author: bool,
     #[cfg_attr(feature = "postgres_query", row(rename = "Moderator"))]
     pub moderator: bool,
-    #[cfg_attr(feature = "postgres_query", row(rename = "Admin"))]
+    #[cfg_attr(feature = "postgres_query", row(rename = "Administrator"))]
     pub admin: bool
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "postgres_query", derive(FromSqlRow))]
 pub struct LoginData {
@@ -47,16 +47,16 @@ pub struct LoginData {
     pub password: String
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct RegisterData {
-    #[serde(rename = "userName", flatten)]
+    #[serde(rename = "userName")]
     pub user_name: String,
     #[serde(rename = "loginData", flatten)]
     pub login_data: LoginData
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 #[cfg_attr(feature = "postgres_query", derive(FromSqlRow))]
 pub struct UserIdPassHash {
     #[cfg_attr(feature = "postgres_query", row(rename = "Id"))]
