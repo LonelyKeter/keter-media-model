@@ -12,7 +12,7 @@ resolver = "2"
 serde = { version = "1.0.126", features = ["derive"], optional = true }
 chrono = { version = "0.4", features = ["serde"] }
 postgres_query = { path = "../postgres-query/postgres_query", optional = true }
-postgres-types = { version = "0.2.0", features = ["derive"], optional = true}
+postgres-types = { version = "0.2.0", features = ["derive", "with-chrono-0_4"], optional = true}
 rust_decimal = { version = "1.15.0", features = ["db-tokio-postgres", "serde-float"] }
 tokio-postgres = { version = "0.7.2", optional = true }
 

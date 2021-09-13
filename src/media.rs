@@ -2,6 +2,10 @@ use crate::*;
 
 pub type MediaKey = i64;
 
+impl SqlType for MediaKey {
+    const SQL_TYPE: Type = Type::INT8;
+}
+
 #[derive(Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize))]
 #[cfg_attr(feature = "postgres", derive(FromSqlRow))]
@@ -95,12 +99,26 @@ pub struct UserReview {
     pub review: ReviewInfo,
 }
 
+use chrono::{DateTime, offset::Utc};
+
 #[derive(Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "postgres", derive(FromSqlRow))]
 pub struct ReviewInfo {
     #[cfg_attr(feature = "postgres", row(rename = "Id"))]
-    pub id: ReviewKey,
+    pub id: ReviewKey,    
+    #[cfg_attr(feature = "serde", serde(flatten))]
+    #[cfg_attr(feature = "postgres", row(flatten))]
+    pub review: Review, 
+    #[cfg_attr(feature = "serde", serde(rename = "date"))]
+    #[cfg_attr(feature = "postgres", row(rename = "Date"))]
+    pub date: DateTime<Utc>
+}
+
+#[derive(Debug, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "postgres", derive(FromSqlRow))]
+pub struct Review {
     #[cfg_attr(feature = "postgres", row(rename = "Rating"))]
     pub rating: ReviewRating,
     #[cfg_attr(feature = "postgres", row(rename = "Text"))]
