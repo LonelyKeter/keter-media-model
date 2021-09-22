@@ -1,28 +1,38 @@
 use crate::*;
-use chrono::{DateTime, offset::Utc};
+use chrono::{offset::FixedOffset, DateTime};
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct Usage {
+#[cfg_attr(feature = "postgres", derive(FromSqlRow))]
+pub struct UserUsage {
     #[cfg_attr(feature = "serde", serde(rename = "materialId"))]
+    #[cfg_attr(feature = "postgres", row(rename = "MaterialId"))]
     pub material_id: media::MaterialKey,
-    #[cfg_attr(feature = "serde", serde(rename = "userName"))]
-    pub user_name: String,
-    pub email: String,
-    pub date: DateTime<Utc>
+    pub date: DateTime<FixedOffset>,
+}
+
+pub enum LicenseSearchKey {
+    Id(LicenseKey),
+    Title(String),
 }
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "postgres", derive(FromSqlRow))]
 pub struct LicenseInfo {
+    #[cfg_attr(feature = "postgres", row(rename = "Title"))]
     pub title: String,
-    pub link: String
+    #[cfg_attr(feature = "postgres", row(rename = "Text"))]
+    pub text: String,
+    #[cfg_attr(feature = "postgres", row(rename = "Date"))]
+    pub date: DateTime<FixedOffset>
 }
 
-
-pub type LicenseKey = u32;
+pub type LicenseKey = i32;
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "postgres", derive(FromSqlRow))]
 pub struct License {
     pub id: LicenseKey,
     #[cfg_attr(feature = "serde", serde(flatten))]
-    pub info: LicenseInfo
+    #[cfg_attr(feature = "postgres", row(flatten))]
+    pub info: LicenseInfo,
 }

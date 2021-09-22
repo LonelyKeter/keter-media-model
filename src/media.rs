@@ -2,10 +2,6 @@ use crate::*;
 
 pub type MediaKey = i64;
 
-impl SqlType for MediaKey {
-    const SQL_TYPE: Type = Type::INT8;
-}
-
 #[derive(Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize))]
 #[cfg_attr(feature = "postgres", derive(FromSqlRow))]
@@ -43,6 +39,9 @@ pub type MaterialSize = i64;
 pub struct MaterialInfo {
     #[cfg_attr(feature = "postgres", row(rename = "Id"))]
     pub id: MaterialKey,
+    #[cfg_attr(feature = "serde", serde(rename = "mediaId"))]
+    #[cfg_attr(feature = "postgres", row(rename = "MediaId"))]
+    pub media_id: MaterialKey,
     #[cfg_attr(feature = "postgres", row(rename = "Format"))]
     pub format: String,
     #[cfg_attr(feature = "postgres", row(rename = "Quality"))]
@@ -52,9 +51,6 @@ pub struct MaterialInfo {
     #[cfg_attr(feature = "serde", serde(rename = "licenseName"))]
     #[cfg_attr(feature = "postgres", row(rename = "LicenseName"))]
     pub license_name: String,
-    #[cfg_attr(feature = "serde", serde(rename = "downloadLink"))]
-    #[cfg_attr(feature = "postgres", row(rename = "DownloadLink"))]
-    pub download_link: String,
 }
 
 #[derive(Debug, PartialEq)]
@@ -90,16 +86,19 @@ pub type ReviewKey = i64;
 #[derive(Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "postgres", derive(FromSqlRow))]
+#[cfg_attr(feature = "postgres", row(split))]
 pub struct UserReview {
     #[cfg_attr(feature = "serde", serde(rename = "userInfo"))]
+    #[cfg_attr(feature = "postgres", row(split = "id"))]
     #[cfg_attr(feature = "postgres", row(flatten))]
     pub user_info: userinfo::UserInfo,
     #[cfg_attr(feature = "serde", serde(flatten))]
+    #[cfg_attr(feature = "postgres", row(split = "id"))]
     #[cfg_attr(feature = "postgres", row(flatten))]
     pub review: ReviewInfo,
 }
 
-use chrono::{DateTime, offset::Utc};
+use chrono::{DateTime, offset::FixedOffset};
 
 #[derive(Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -112,7 +111,7 @@ pub struct ReviewInfo {
     pub review: Review, 
     #[cfg_attr(feature = "serde", serde(rename = "date"))]
     #[cfg_attr(feature = "postgres", row(rename = "Date"))]
-    pub date: DateTime<Utc>
+    pub date: DateTime<FixedOffset>
 }
 
 #[derive(Debug, PartialEq)]
@@ -155,6 +154,11 @@ pub struct RegisterMedia {
     pub tags: Vec<String>,
     #[cfg_attr(feature = "serde", serde(rename = "defaultLicense"))]
     pub default_license: Option<String>,
+}
+
+pub struct AddMaterial {
+    pub media_id: MediaKey,
+    pub quality: Quality
 }
 
 #[cfg(test)]
@@ -272,7 +276,6 @@ mod tests {
                 quality: Quality::Medium,
                 size: 12345,
                 license_name: String::from("FREE"),
-                download_link: String::from("http://donload.file.com/1")
             };
 
             let query = query!("
@@ -280,7 +283,7 @@ mod tests {
                     1::Int8 as Id, '.jpeg' as Format, 
                     'MEDIUM'::public.quality as Quality,
                     12345::Bigint as Size, 
-                    'FREE' as LicenseName, 'http://donload.file.com/1' as DownloadLink;"
+                    'FREE' as LicenseName;"
             );
             let row = query.query_one(&client).await.unwrap();
             let queried = MaterialInfo::from_row(&row).unwrap();
@@ -298,7 +301,6 @@ mod tests {
                 quality: Quality::VeryLow,
                 size: 12345,
                 license_name: String::from("FREE"),
-                download_link: String::from("http://donload.file.com/1")
             };
             let expected2 = MaterialInfo {
                 id: 2,
@@ -306,7 +308,6 @@ mod tests {
                 quality: Quality::VeryHigh,
                 size: 54321,
                 license_name: String::from("FREE"),
-                download_link: String::from("http://donload.file.com/2")
             };
             let expected = vec![expected1, expected2];
 
@@ -318,19 +319,17 @@ mod tests {
                             '.jpeg', 
                             'VERY LOW'::public.quality,
                             12345::bigint,
-                            'FREE', 
-                            'http://donload.file.com/1'
+                            'FREE'
                         ),
                         (
                             2::Int8, 
                             '.png', 
                             'VERY HIGH'::public.quality,
                             54321::bigint,
-                            'FREE', 
-                            'http://donload.file.com/2'
+                            'FREE'
                         )
                     ) x 
-                    (Id, Format, Quality, Size, LicenseName, DownloadLink);"
+                    (Id, Format, Quality, Size, LicenseName);"
             );
             let rows = query.query(&client).await.unwrap();
             let queried = MaterialInfo::from_row_multi(&rows).unwrap();            
@@ -339,6 +338,37 @@ mod tests {
                 assert!(queried.contains(&info));
             }
         }    
-           
+
+        #[tokio::test]
+        async fn user_review_once() {
+            use chrono::{TimeZone};
+            let client = client().await.unwrap();
+
+            let expected = UserReview {
+                user_info: userinfo::UserInfo {
+                    id: 5,
+                    name: String::from("First user")
+                },
+                review: ReviewInfo {
+                    id: 1,
+                    review: Review { 
+                        rating: 6, 
+                        text: Some(String::from("Not so bad"))
+                    },
+                    date: FixedOffset::east(2 * 3600).ymd(2020, 12, 8).and_hms(7, 7, 7)
+                }
+            };
+
+            let query = query!("
+                SELECT 
+                    5::Int8 as Id, 'First user' as Name, 
+                    1::Int8 as Id, 6::Int2 as Rating, 'Not so bad' as Text,
+                    '2020-12-08 07:07:07'::Timestamptz as Date;"
+            );
+            let row = query.query_one(&client).await.unwrap();
+            let queried = UserReview::from_row(&row).unwrap();
+
+            assert_eq!(expected, queried);
+        }
     }
 }
