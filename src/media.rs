@@ -46,8 +46,6 @@ pub struct MaterialInfo {
     pub format: String,
     #[cfg_attr(feature = "postgres", row(rename = "Quality"))]
     pub quality: Quality,
-    #[cfg_attr(feature = "postgres", row(rename = "Size"))]
-    pub size: MaterialSize,
     #[cfg_attr(feature = "serde", serde(rename = "licenseName"))]
     #[cfg_attr(feature = "postgres", row(rename = "LicenseName"))]
     pub license_name: String,
@@ -56,9 +54,10 @@ pub struct MaterialInfo {
 #[derive(Debug, PartialEq)]
 //TODO: Material quality enumeration
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "postgres", derive(FromSql))]
+#[cfg_attr(feature = "postgres", derive(FromSql, ToSql))]
 #[cfg_attr(feature = "postgres", postgres(name = "quality"))]
 pub enum Quality {    
+    #[cfg_attr(feature = "serde", serde(rename = "Very low"))]
     #[cfg_attr(feature = "postgres", postgres(name = "VERY LOW"))]
     VeryLow,
     #[cfg_attr(feature = "postgres", postgres(name = "LOW"))]
@@ -67,6 +66,7 @@ pub enum Quality {
     Medium,
     #[cfg_attr(feature = "postgres", postgres(name = "HIGH"))]
     High,
+    #[cfg_attr(feature = "serde", serde(rename = "Very high"))]
     #[cfg_attr(feature = "postgres", postgres(name = "VERY HIGH"))]
     VeryHigh
 }
@@ -154,11 +154,6 @@ pub struct RegisterMedia {
     pub tags: Vec<String>,
     #[cfg_attr(feature = "serde", serde(rename = "defaultLicense"))]
     pub default_license: Option<String>,
-}
-
-pub struct AddMaterial {
-    pub media_id: MediaKey,
-    pub quality: Quality
 }
 
 #[cfg(test)]
@@ -272,17 +267,16 @@ mod tests {
 
             let expected = MaterialInfo {
                 id: 1,
+                media_id: 1,
                 format: String::from(".jpeg"),
                 quality: Quality::Medium,
-                size: 12345,
                 license_name: String::from("FREE"),
             };
 
             let query = query!("
                 SELECT 
-                    1::Int8 as Id, '.jpeg' as Format, 
+                    1::Int8 as Id, 1::Int8 as MediaId, '.jpeg' as Format, 
                     'MEDIUM'::public.quality as Quality,
-                    12345::Bigint as Size, 
                     'FREE' as LicenseName;"
             );
             let row = query.query_one(&client).await.unwrap();
@@ -297,16 +291,16 @@ mod tests {
 
             let expected1 = MaterialInfo {
                 id: 1,
+                media_id: 1,
                 format: String::from(".jpeg"),
                 quality: Quality::VeryLow,
-                size: 12345,
                 license_name: String::from("FREE"),
             };
             let expected2 = MaterialInfo {
                 id: 2,
+                media_id: 1,
                 format: String::from(".png"),
                 quality: Quality::VeryHigh,
-                size: 54321,
                 license_name: String::from("FREE"),
             };
             let expected = vec![expected1, expected2];
@@ -316,20 +310,20 @@ mod tests {
                     (VALUES
                         (
                             1::Int8, 
+                            1::Int8, 
                             '.jpeg', 
                             'VERY LOW'::public.quality,
-                            12345::bigint,
                             'FREE'
                         ),
                         (
-                            2::Int8, 
+                            2::Int8,                             
+                            1::Int8, 
                             '.png', 
                             'VERY HIGH'::public.quality,
-                            54321::bigint,
                             'FREE'
                         )
                     ) x 
-                    (Id, Format, Quality, Size, LicenseName);"
+                    (Id, MediaId, Format, Quality, LicenseName);"
             );
             let rows = query.query(&client).await.unwrap();
             let queried = MaterialInfo::from_row_multi(&rows).unwrap();            

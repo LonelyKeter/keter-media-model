@@ -1,13 +1,11 @@
 #[cfg(feature = "postgres")]
 use postgres_query::FromSqlRow;
 #[cfg(feature = "postgres")]
-use postgres_types::FromSql;
+use postgres_types::{FromSql, ToSql};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "postgres")]
 pub use sql_type::SqlType;
-
-use std::num::*;
 
 pub mod media;
 pub mod reviews;
