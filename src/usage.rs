@@ -1,4 +1,4 @@
-use crate::{*, userinfo::{UserInfo, UserKey}};
+use crate::{*, userinfo::{UserInfo}};
 use chrono::{offset::FixedOffset, DateTime};
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -11,9 +11,10 @@ pub struct Usage {
     pub material_id: media::MaterialKey,
     #[cfg_attr(feature = "postgres", row(rename = "Date"))]
     pub date: DateTime<FixedOffset>,
-    #[cfg_attr(feature = "postgres", row(split = "id"))]
-    #[cfg_attr(feature = "postgres", row(flatten))]
-    pub license: License
+    #[cfg_attr(feature = "postgres", row(rename = "Rating"))]
+    pub rating: Option<i16>,
+    #[cfg_attr(feature = "postgres", row(flatten, split = "id"))]
+    pub license: License,
 }
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]

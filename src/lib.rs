@@ -31,7 +31,8 @@ mod sql_type {
     impl_sql_type!(
         i64, Type::INT8,
         i32, Type::INT4,
-        i16, Type::INT2
+        i16, Type::INT2,
+        String, Type::VARCHAR
     );
 }
 

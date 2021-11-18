@@ -1,6 +1,8 @@
 use crate::*;
 
 pub type MediaKey = i64;
+pub type Rating = f32;
+pub type Count = i64;
 
 #[derive(Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize))]
@@ -17,12 +19,14 @@ pub struct MediaInfo {
     #[cfg_attr(feature = "postgres", row(flatten, split = "id"))]
     pub author: userinfo::AuthorInfo,
     #[cfg_attr(feature = "postgres", row(rename = "Rating"))]
-    pub rating: MediaRating,
+    pub rating: Option<Rating>,
+    #[cfg_attr(feature = "postgres", row(rename = "UseCount"))]
+    pub use_count: Count
 }
 
 #[derive(Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "postgres", derive(FromSql))]
+#[cfg_attr(feature = "postgres", derive(FromSql, ToSql))]
 #[cfg_attr(feature = "postgres", postgres(name = "mediakind"))]
 pub enum MediaKind {
     Audio,
@@ -41,7 +45,7 @@ pub struct MaterialInfo {
     pub id: MaterialKey,
     #[cfg_attr(feature = "serde", serde(rename = "mediaId"))]
     #[cfg_attr(feature = "postgres", row(rename = "MediaId"))]
-    pub media_id: MaterialKey,
+    pub media_id: MediaKey,
     #[cfg_attr(feature = "postgres", row(rename = "Format"))]
     pub format: String,
     #[cfg_attr(feature = "postgres", row(rename = "Quality"))]
@@ -49,6 +53,13 @@ pub struct MaterialInfo {
     #[cfg_attr(feature = "serde", serde(rename = "licenseName"))]
     #[cfg_attr(feature = "postgres", row(rename = "LicenseName"))]
     pub license_name: String,
+    #[cfg_attr(feature = "postgres", row(rename = "Rating"))]
+    pub rating: Option<Rating>,
+    #[cfg_attr(feature = "postgres", row(rename = "UseCount"))]
+    pub use_count: Count,    
+    #[cfg_attr(feature = "serde", serde(rename = "isUsed"))]
+    #[cfg_attr(feature = "postgres", row(rename = "IsUsed"))]
+    pub is_used: Option<bool>
 }
 
 #[derive(Debug, PartialEq)]
@@ -71,13 +82,12 @@ pub enum Quality {
     VeryHigh
 }
 
-pub type MediaRating = f32;
 
 #[derive(Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize))]
 pub struct Tag {
     pub title: String,
-    pub popularity: MediaRating,
+    pub popularity: Rating,
 }
 
 pub type ReviewRating = i16;
@@ -89,12 +99,10 @@ pub type ReviewKey = i64;
 #[cfg_attr(feature = "postgres", row(split))]
 pub struct UserReview {
     #[cfg_attr(feature = "serde", serde(rename = "userInfo"))]
-    #[cfg_attr(feature = "postgres", row(split = "id"))]
-    #[cfg_attr(feature = "postgres", row(flatten))]
+    #[cfg_attr(feature = "postgres", row(flatten, split = "id"))]
     pub user_info: userinfo::UserInfo,
-    #[cfg_attr(feature = "serde", serde(flatten))]
-    #[cfg_attr(feature = "postgres", row(split = "id"))]
-    #[cfg_attr(feature = "postgres", row(flatten))]
+    #[cfg_attr(feature = "serde", serde(flatten))] 
+    #[cfg_attr(feature = "postgres", row(flatten, split = "id"))]
     pub review: ReviewInfo,
 }
 
@@ -103,13 +111,12 @@ use chrono::{DateTime, offset::FixedOffset};
 #[derive(Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "postgres", derive(FromSqlRow))]
-pub struct ReviewInfo {
+pub struct ReviewInfo {    
     #[cfg_attr(feature = "postgres", row(rename = "Id"))]
     pub id: ReviewKey,    
-    #[cfg_attr(feature = "serde", serde(flatten))]
     #[cfg_attr(feature = "postgres", row(flatten))]
-    pub review: Review, 
-    #[cfg_attr(feature = "serde", serde(rename = "date"))]
+    #[cfg_attr(feature = "serde", serde(flatten))] 
+    pub review: Review,
     #[cfg_attr(feature = "postgres", row(rename = "Date"))]
     pub date: DateTime<FixedOffset>
 }
@@ -118,10 +125,8 @@ pub struct ReviewInfo {
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "postgres", derive(FromSqlRow))]
 pub struct Review {
-    #[cfg_attr(feature = "postgres", row(rename = "Rating"))]
-    pub rating: ReviewRating,
     #[cfg_attr(feature = "postgres", row(rename = "Text"))]
-    pub text: Option<String>,
+    pub text: String
 }
 
 #[derive(Debug, PartialEq)]
@@ -154,6 +159,13 @@ pub struct RegisterMedia {
     pub tags: Vec<String>,
     #[cfg_attr(feature = "serde", serde(rename = "defaultLicense"))]
     pub default_license: Option<String>,
+}
+
+
+#[derive(Debug, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+pub struct UserRating {
+    pub rating: i16
 }
 
 #[cfg(test)]
