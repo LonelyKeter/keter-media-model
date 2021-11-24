@@ -10,28 +10,35 @@ pub type Count = i64;
 #[cfg_attr(feature = "postgres", row(split))]
 pub struct MediaInfo {
     #[cfg_attr(feature = "postgres", row(split = "id"))]
-    #[cfg_attr(feature = "postgres", row(rename = "Id"))]
     pub id: MediaKey,
-    #[cfg_attr(feature = "postgres", row(rename = "Title"))]
     pub title: String,
-    #[cfg_attr(feature = "postgres", row(rename = "Kind"))]
     pub kind: MediaKind,
     #[cfg_attr(feature = "postgres", row(flatten, split = "id"))]
     pub author: userinfo::AuthorInfo,
-    #[cfg_attr(feature = "postgres", row(rename = "Rating"))]
     pub rating: Option<Rating>,
-    #[cfg_attr(feature = "postgres", row(rename = "UseCount"))]
     pub use_count: Count
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "postgres", derive(FromSql, ToSql))]
 #[cfg_attr(feature = "postgres", postgres(name = "mediakind"))]
 pub enum MediaKind {
+    #[cfg_attr(feature = "postgres", postgres(name = "audio"))]
     Audio,
-    Video,
+    #[cfg_attr(feature = "postgres", postgres(name = "video"))]
+    Video,    
+    #[cfg_attr(feature = "postgres", postgres(name = "image"))]
     Image,
+}
+
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+pub struct MediaFilterOptions {
+    pub title: Option<String>,
+    pub kinds: Option<Vec<MediaKind>>,
+    pub popularity: Option<FilterOrdering>,
+    pub times_used: Option<FilterOrdering>
 }
 
 pub type MaterialKey = i64;
@@ -41,53 +48,37 @@ pub type MaterialSize = i64;
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "postgres", derive(FromSqlRow))]
 pub struct MaterialInfo {
-    #[cfg_attr(feature = "postgres", row(rename = "Id"))]
     pub id: MaterialKey,
     #[cfg_attr(feature = "serde", serde(rename = "mediaId"))]
-    #[cfg_attr(feature = "postgres", row(rename = "MediaId"))]
     pub media_id: MediaKey,
-    #[cfg_attr(feature = "postgres", row(rename = "Format"))]
     pub format: String,
-    #[cfg_attr(feature = "postgres", row(rename = "Quality"))]
     pub quality: Quality,
     #[cfg_attr(feature = "serde", serde(rename = "licenseName"))]
-    #[cfg_attr(feature = "postgres", row(rename = "LicenseName"))]
     pub license_name: String,
-    #[cfg_attr(feature = "postgres", row(rename = "Rating"))]
     pub rating: Option<Rating>,
-    #[cfg_attr(feature = "postgres", row(rename = "UseCount"))]
     pub use_count: Count,    
     #[cfg_attr(feature = "serde", serde(rename = "isUsed"))]
-    #[cfg_attr(feature = "postgres", row(rename = "IsUsed"))]
     pub is_used: Option<bool>
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 //TODO: Material quality enumeration
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "postgres", derive(FromSql, ToSql))]
 #[cfg_attr(feature = "postgres", postgres(name = "quality"))]
 pub enum Quality {    
     #[cfg_attr(feature = "serde", serde(rename = "Very low"))]
-    #[cfg_attr(feature = "postgres", postgres(name = "VERY LOW"))]
+    #[cfg_attr(feature = "postgres", postgres(name = "very low"))]
     VeryLow,
-    #[cfg_attr(feature = "postgres", postgres(name = "LOW"))]
+    #[cfg_attr(feature = "postgres", postgres(name = "low"))]
     Low,
-    #[cfg_attr(feature = "postgres", postgres(name = "MEDIUM"))]
+    #[cfg_attr(feature = "postgres", postgres(name = "medium"))]
     Medium,
-    #[cfg_attr(feature = "postgres", postgres(name = "HIGH"))]
+    #[cfg_attr(feature = "postgres", postgres(name = "high"))]
     High,
     #[cfg_attr(feature = "serde", serde(rename = "Very high"))]
-    #[cfg_attr(feature = "postgres", postgres(name = "VERY HIGH"))]
+    #[cfg_attr(feature = "postgres", postgres(name = "very high"))]
     VeryHigh
-}
-
-
-#[derive(Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Serialize))]
-pub struct Tag {
-    pub title: String,
-    pub popularity: Rating,
 }
 
 pub type ReviewRating = i16;
@@ -112,12 +103,10 @@ use chrono::{DateTime, offset::FixedOffset};
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "postgres", derive(FromSqlRow))]
 pub struct ReviewInfo {    
-    #[cfg_attr(feature = "postgres", row(rename = "Id"))]
     pub id: ReviewKey,    
     #[cfg_attr(feature = "postgres", row(flatten))]
     #[cfg_attr(feature = "serde", serde(flatten))] 
     pub review: Review,
-    #[cfg_attr(feature = "postgres", row(rename = "Date"))]
     pub date: DateTime<FixedOffset>
 }
 
@@ -125,7 +114,6 @@ pub struct ReviewInfo {
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "postgres", derive(FromSqlRow))]
 pub struct Review {
-    #[cfg_attr(feature = "postgres", row(rename = "Text"))]
     pub text: String
 }
 
@@ -133,9 +121,7 @@ pub struct Review {
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "postgres", derive(FromSqlRow))]
 pub struct RemoveReview {
-    #[cfg_attr(feature = "postgres", row(rename = "Id"))]
     pub id: ReviewKey,
-    #[cfg_attr(feature = "postgres", row(rename = "Reason"))]
     pub reason: ReviewRemovalReasonKey,
 }
 
@@ -145,9 +131,7 @@ pub type ReviewRemovalReasonKey = i32;
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "postgres", derive(FromSqlRow))]
 pub struct ReviewRemovalReason {
-    #[cfg_attr(feature = "postgres", row(rename = "Id"))]
     pub id: ReviewRemovalReasonKey,
-    #[cfg_attr(feature = "postgres", row(rename = "Statement"))]
     pub statement: String,
 }
 

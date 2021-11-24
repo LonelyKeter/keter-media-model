@@ -5,13 +5,9 @@ use chrono::{offset::FixedOffset, DateTime};
 #[cfg_attr(feature = "postgres", derive(FromSqlRow))]
 #[cfg_attr(feature = "postgres", row(split))]
 pub struct Usage {
-    #[cfg_attr(feature = "postgres", row(split = "materialid"))]
-    #[cfg_attr(feature = "postgres", row(rename = "MaterialId"))]
     #[cfg_attr(feature = "serde", serde(rename = "materialId"))]
     pub material_id: media::MaterialKey,
-    #[cfg_attr(feature = "postgres", row(rename = "Date"))]
     pub date: DateTime<FixedOffset>,
-    #[cfg_attr(feature = "postgres", row(rename = "Rating"))]
     pub rating: Option<i16>,
     #[cfg_attr(feature = "postgres", row(flatten, split = "id"))]
     pub license: License,
@@ -25,7 +21,7 @@ pub struct UserUsage {
     #[cfg_attr(feature = "postgres", row(split = "id"))]
     user: UserInfo,
     #[cfg_attr(feature = "postgres", row(flatten))]
-    #[cfg_attr(feature = "postgres", row(split = "materialid"))]
+    #[cfg_attr(feature = "postgres", row(split = "material_id"))]
     usage: Usage
 }
 
@@ -37,11 +33,8 @@ pub enum LicenseSearchKey {
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "postgres", derive(FromSqlRow))]
 pub struct LicenseInfo {
-    #[cfg_attr(feature = "postgres", row(rename = "Title"))]
     pub title: String,
-    #[cfg_attr(feature = "postgres", row(rename = "Text"))]
     pub text: String,
-    #[cfg_attr(feature = "postgres", row(rename = "Date"))]
     pub date: DateTime<FixedOffset>
 }
 

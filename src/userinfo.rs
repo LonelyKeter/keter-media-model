@@ -6,9 +6,7 @@ pub type UserKey = i64;
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "postgres", derive(FromSqlRow))]
 pub struct UserInfo {
-    #[cfg_attr(feature = "postgres", row(rename = "Id"))]
     pub id: UserKey,
-    #[cfg_attr(feature = "postgres", row(rename = "Name"))]
     pub name: String,
 }
 
@@ -33,12 +31,23 @@ pub struct AuthorContacts {
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "postgres", derive(FromSqlRow))]
 pub struct UserPriveleges {
-    #[cfg_attr(feature = "postgres", row(rename = "Author"))]
-    pub author: bool,
-    #[cfg_attr(feature = "postgres", row(rename = "Moderator"))]
-    pub moderator: bool,
-    #[cfg_attr(feature = "postgres", row(rename = "Administrator"))]
-    pub admin: bool,
+    #[cfg_attr(feature = "serde", serde(rename = "isAuthor"))]
+    pub is_author: bool,
+    #[cfg_attr(feature = "serde", serde(rename = "administrationPermissions"))]    
+    pub administration_permissions: AdministrationPermissions
+}
+
+#[derive(Debug, PartialEq, Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "postgres", derive(FromSql, ToSql))]
+#[cfg_attr(feature = "postgres", postgres(name = "administration_permissions"))]
+pub enum AdministrationPermissions {
+    #[cfg_attr(feature = "postgres", postgres(name = "none"))]
+    None,
+    #[cfg_attr(feature = "postgres", postgres(name = "moderator"))]
+    Moderator,
+    #[cfg_attr(feature = "postgres", postgres(name = "admin"))]
+    Admin
 }
 
 #[derive(Clone, Debug, PartialEq)]

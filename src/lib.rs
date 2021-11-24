@@ -12,6 +12,37 @@ pub mod reviews;
 pub mod usage;
 pub mod userinfo;
 
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "postgres", derive(ToSql))]
+#[cfg_attr(feature = "postgres", postgres(name = "FILTER_ORDERING"))]
+pub enum FilterOrdering {    
+    #[cfg_attr(feature = "serde", serde(rename = "asc"))]
+    #[cfg_attr(feature = "postgres", postgres(name = "asc"))]
+    Ascending,
+    #[cfg_attr(feature = "serde", serde(rename = "desc"))]    
+    #[cfg_attr(feature = "postgres", postgres(name = "desc"))]
+    Descending,
+}
+
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "postgres", derive(ToSql))]
+#[cfg_attr(feature = "postgres", postgres(name = "LIMITS"))]
+pub struct Limits {
+    min: Option<i64>,
+    max: Option<i64>
+}
+
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "postgres", derive(ToSql))]
+#[cfg_attr(feature = "postgres", postgres(name = "RANGE_FILTER"))]
+pub struct RangeFilter {
+    ordering: FilterOrdering,
+    limits: Limits
+}
+
 #[cfg(feature = "postgres")]
 mod sql_type {
     use tokio_postgres::types::Type;
