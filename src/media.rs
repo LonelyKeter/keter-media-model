@@ -37,8 +37,8 @@ pub enum MediaKind {
 pub struct MediaFilterOptions {
     pub title: Option<String>,
     pub kinds: Option<Vec<MediaKind>>,
-    pub popularity: Option<FilterOrdering>,
-    pub times_used: Option<FilterOrdering>
+    pub popularity: Option<RangeFilter>,
+    pub times_used: Option<RangeFilter>
 }
 
 pub type MaterialKey = i64;

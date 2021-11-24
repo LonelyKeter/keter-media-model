@@ -30,8 +30,8 @@ pub enum FilterOrdering {
 #[cfg_attr(feature = "postgres", derive(ToSql))]
 #[cfg_attr(feature = "postgres", postgres(name = "LIMITS"))]
 pub struct Limits {
-    min: Option<i64>,
-    max: Option<i64>
+    pub min: Option<i64>,
+    pub max: Option<i64>
 }
 
 #[derive(Debug, Clone)]
@@ -39,8 +39,8 @@ pub struct Limits {
 #[cfg_attr(feature = "postgres", derive(ToSql))]
 #[cfg_attr(feature = "postgres", postgres(name = "RANGE_FILTER"))]
 pub struct RangeFilter {
-    ordering: FilterOrdering,
-    limits: Limits
+    pub ordering: Option<FilterOrdering>,
+    pub limits: Limits
 }
 
 #[cfg(feature = "postgres")]
