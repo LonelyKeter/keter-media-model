@@ -15,7 +15,8 @@ pub struct MediaInfo {
     pub kind: MediaKind,
     #[cfg_attr(feature = "postgres", row(flatten, split = "id"))]
     pub author: userinfo::AuthorInfo,
-    pub rating: Option<Rating>,
+    pub rating: Option<Rating>,    
+    #[cfg_attr(feature = "serde", serde(rename = "useCount"))]
     pub use_count: Count
 }
 
@@ -56,6 +57,7 @@ pub struct MaterialInfo {
     #[cfg_attr(feature = "serde", serde(rename = "licenseName"))]
     pub license_name: String,
     pub rating: Option<Rating>,
+    #[cfg_attr(feature = "serde", serde(rename = "useCount"))]
     pub use_count: Count,    
     #[cfg_attr(feature = "serde", serde(rename = "isUsed"))]
     pub is_used: Option<bool>

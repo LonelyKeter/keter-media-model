@@ -12,10 +12,12 @@ pub mod reviews;
 pub mod usage;
 pub mod userinfo;
 
+//NOTE: postres types' names are lower_case!!!!!!!!!
+
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "postgres", derive(ToSql))]
-#[cfg_attr(feature = "postgres", postgres(name = "FILTER_ORDERING"))]
+#[cfg_attr(feature = "postgres", derive(ToSql, FromSql))]
+#[cfg_attr(feature = "postgres", postgres(name = "filter_ordering"))]
 pub enum FilterOrdering {    
     #[cfg_attr(feature = "serde", serde(rename = "asc"))]
     #[cfg_attr(feature = "postgres", postgres(name = "asc"))]
@@ -27,8 +29,8 @@ pub enum FilterOrdering {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "postgres", derive(ToSql))]
-#[cfg_attr(feature = "postgres", postgres(name = "LIMITS"))]
+#[cfg_attr(feature = "postgres", derive(ToSql, FromSql))]
+#[cfg_attr(feature = "postgres", postgres(name = "limits"))]
 pub struct Limits {
     pub min: Option<i64>,
     pub max: Option<i64>
@@ -36,8 +38,8 @@ pub struct Limits {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "postgres", derive(ToSql))]
-#[cfg_attr(feature = "postgres", postgres(name = "RANGE_FILTER"))]
+#[cfg_attr(feature = "postgres", derive(ToSql, FromSql))]
+#[cfg_attr(feature = "postgres", postgres(name = "range_filter"))]
 pub struct RangeFilter {
     pub ordering: Option<FilterOrdering>,
     pub limits: Limits
