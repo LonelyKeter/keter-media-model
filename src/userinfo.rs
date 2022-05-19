@@ -17,14 +17,24 @@ pub struct AuthorInfo {
     #[cfg_attr(feature = "serde", serde(flatten))]
     #[cfg_attr(feature = "postgres", row(flatten))]
     pub user_info: UserInfo,
-    pub country: String,
+    #[cfg_attr(feature = "postgres", row(flatten))]
+    pub contacts: AuthorContacts,
+    pub rating: Option<Rating>
 }
 
 #[derive(Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "postgres", derive(FromSqlRow))]
 pub struct AuthorContacts {
-    pub name: String,
     pub email: String,
+}
+
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+pub struct AuthorFilterOptions {
+    pub name: Option<String>,
+    pub kinds: Option<Vec<media::MediaKind>>,
+    pub popularity: Option<RangeFilter>
 }
 
 #[derive(Clone, Debug, PartialEq)]

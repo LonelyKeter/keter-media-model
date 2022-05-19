@@ -1,7 +1,6 @@
 use crate::*;
 
 pub type MediaKey = i64;
-pub type Rating = f32;
 pub type Count = i64;
 
 #[derive(Debug, PartialEq)]
@@ -14,7 +13,7 @@ pub struct MediaInfo {
     pub title: String,
     pub kind: MediaKind,
     #[cfg_attr(feature = "postgres", row(flatten, split = "id"))]
-    pub author: userinfo::AuthorInfo,
+    pub author: userinfo::UserInfo,
     pub rating: Option<Rating>,    
     #[cfg_attr(feature = "serde", serde(rename = "useCount"))]
     pub use_count: Count

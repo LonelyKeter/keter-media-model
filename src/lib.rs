@@ -14,6 +14,8 @@ pub mod userinfo;
 
 //NOTE: postres types' names are lower_case!!!!!!!!!
 
+pub type Rating = f32;
+
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "postgres", derive(ToSql, FromSql))]
@@ -24,7 +26,7 @@ pub enum FilterOrdering {
     Ascending,
     #[cfg_attr(feature = "serde", serde(rename = "desc"))]    
     #[cfg_attr(feature = "postgres", postgres(name = "desc"))]
-    Descending,
+    Descending
 }
 
 #[derive(Debug, Clone)]
